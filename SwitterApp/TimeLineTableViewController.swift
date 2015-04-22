@@ -120,60 +120,6 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
         let cell: SweetTableViewCell = tableView!.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath!) as SweetTableViewCell
         let sweet:PFObject = self.timelineData[indexPath!.row] as PFObject
         
-        
-        cell.sweetTextView.alpha = 0
-        cell.timestampLabel.alpha = 0
-        cell.usernameLabel.alpha = 0
-        
-        cell.sweetTextView.text = sweet.objectForKey("content") as NSString
-        // Configure the cell...
-        var findSweeter:PFQuery = PFUser.query()
-        
-//        let dateFormatter:NSDateFormatter = NSDateFormatter()
-//        dateFormatter.dateFormat = "yyyy-MM-dd"
-//        
-        
-        let formatter = NSDateFormatter()
-        if NSDate().timeIntervalSinceDate(sweet.createdAt) > 24*60*60 {
-            formatter.dateStyle = NSDateFormatterStyle.ShortStyle
-        } else {
-            formatter.timeStyle = NSDateFormatterStyle.ShortStyle
-        }
-
-        
-        cell.timestampLabel.text = formatter.stringFromDate(sweet.createdAt)
-        findSweeter.whereKey("objectId", equalTo: sweet.objectForKey("sweeter").objectId)
-        findSweeter.findObjectsInBackgroundWithBlock{
-            (objects:[AnyObject]!, error:NSError!) ->Void in
-            if error == nil {
-                var user:PFUser = (objects! as  NSArray).lastObject as PFUser
-                if let user = (objects! as  NSArray).lastObject as?  PFUser {
-                    cell.usernameLabel.text = user.username
-                    UIView.animateWithDuration(1, animations: {
-                        cell.sweetTextView.alpha = 1
-                        cell.timestampLabel.alpha = 1
-                        cell.usernameLabel.alpha = 1
-                    })
-                    
-                    // get profile images
-                    var profileImageURL: NSURL?
-                    if (user.objectForKey("gender") as NSObject == true) {  // male
-                        profileImageURL = NSURL(string: "http://images.clipartpanda.com/sad-boy-clipart-little-boy-clip-art-9932.jpg")
-                    } else {
-                        profileImageURL =  NSURL(string: "http://fc08.deviantart.net/fs70/f/2013/043/6/4/dynasty_warriors_8_wang_yuanji_avatar_icon_by_mayahabee-d5uqwgp.png")
-
-                    }
-                    dispatch_async(dispatch_get_global_queue(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1 ? Int(QOS_CLASS_USER_INITIATED.value) : DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
-                        let imageData = NSData(contentsOfURL: profileImageURL!)
-                        dispatch_async(dispatch_get_main_queue()) {
-                                if imageData != nil {
-                                    cell.avatarImg?.image = UIImage(data: imageData!)
-                                }
-                        }
-                    }
-                }
-            }
-        }
         cell.sweet = sweet
         return cell
     }
