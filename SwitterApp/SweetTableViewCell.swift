@@ -19,6 +19,13 @@ class SweetTableViewCell: UITableViewCell {
     
     @IBOutlet weak var avatarImg: UIImageView! = UIImageView()
     
+    @IBOutlet weak var comentCountLabel: UILabel!  = UILabel()
+
+    @IBOutlet weak var commentLabel: UILabel! = UILabel()
+    
+    @IBOutlet weak var makeComment: UIButton! = UIButton()
+    
+    
     var sweet :PFObject? {
         didSet {
             updateUI()
@@ -29,6 +36,9 @@ class SweetTableViewCell: UITableViewCell {
         self.sweetTextView.alpha = 0
         self.timestampLabel.alpha = 0
         self.usernameLabel.alpha = 0
+        
+        self.comentCountLabel.text = "5"
+        self.commentLabel.text = "Comment"
         
         self.sweetTextView.text = self.sweet!.objectForKey("content") as NSString
         // Configure the cell...
@@ -88,7 +98,7 @@ class SweetTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+//        accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
     }
 
     override func setSelected(selected: Bool, animated: Bool) {

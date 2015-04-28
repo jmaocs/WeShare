@@ -11,7 +11,6 @@
 		3F30BCF91A7EAADA007F00EB /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F30BCF81A7EAADA007F00EB /* Social.framework */; };
 		3F64D5C21AB88F0700CC549F /* ParseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F64D5C11AB88F0700CC549F /* ParseUI.framework */; };
 		3F719EE41A6D68F700D1E00D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F719EE31A6D68F700D1E00D /* AppDelegate.swift */; };
-		3F719EE61A6D68F700D1E00D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F719EE51A6D68F700D1E00D /* ViewController.swift */; };
 		3F719EEB1A6D68F700D1E00D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F719EEA1A6D68F700D1E00D /* Images.xcassets */; };
 		3F719EEE1A6D68F700D1E00D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3F719EEC1A6D68F700D1E00D /* LaunchScreen.xib */; };
 		3F719EFA1A6D68F700D1E00D /* SwitterAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F719EF91A6D68F700D1E00D /* SwitterAppTests.swift */; };
@@ -29,6 +28,7 @@
 		3F719F1A1A6D6A0800D1E00D /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F719F191A6D6A0800D1E00D /* Parse.framework */; };
 		3F7AE71D1AE71C4B00A66E68 /* DetailSweetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F7AE71C1AE71C4B00A66E68 /* DetailSweetTableViewCell.swift */; };
 		3F7AE71F1AE726A400A66E68 /* DetailCommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F7AE71E1AE726A400A66E68 /* DetailCommentTableViewCell.swift */; };
+		3F85D87F1AE83DD900E45E82 /* CommentEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F85D87E1AE83DD900E45E82 /* CommentEditViewController.swift */; };
 		3F9656D81A6D71EE00935320 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F9656D71A6D71EE00935320 /* Bolts.framework */; };
 		3F9656DA1A6D780D00935320 /* myBoard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F9656D91A6D780D00935320 /* myBoard.storyboard */; };
 		3F9656DE1A6D7FD400935320 /* TimeLineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9656DD1A6D7FD400935320 /* TimeLineTableViewController.swift */; };
@@ -54,7 +54,6 @@
 		3F719EDE1A6D68F700D1E00D /* SwitterApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwitterApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F719EE21A6D68F700D1E00D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F719EE31A6D68F700D1E00D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		3F719EE51A6D68F700D1E00D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		3F719EEA1A6D68F700D1E00D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		3F719EED1A6D68F700D1E00D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		3F719EF31A6D68F700D1E00D /* SwitterAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwitterAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,6 +74,7 @@
 		3F719F1C1A6D6A6800D1E00D /* SwitterApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwitterApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		3F7AE71C1AE71C4B00A66E68 /* DetailSweetTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailSweetTableViewCell.swift; sourceTree = "<group>"; };
 		3F7AE71E1AE726A400A66E68 /* DetailCommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailCommentTableViewCell.swift; sourceTree = "<group>"; };
+		3F85D87E1AE83DD900E45E82 /* CommentEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentEditViewController.swift; sourceTree = "<group>"; };
 		3F9656D71A6D71EE00935320 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		3F9656D91A6D780D00935320 /* myBoard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = myBoard.storyboard; sourceTree = "<group>"; };
 		3F9656DD1A6D7FD400935320 /* TimeLineTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeLineTableViewController.swift; sourceTree = "<group>"; };
@@ -142,8 +142,8 @@
 				3F9656DD1A6D7FD400935320 /* TimeLineTableViewController.swift */,
 				3F9656DF1A6D83EB00935320 /* ComposeViewController.swift */,
 				3F719EE31A6D68F700D1E00D /* AppDelegate.swift */,
-				3F719EE51A6D68F700D1E00D /* ViewController.swift */,
 				3F9656D91A6D780D00935320 /* myBoard.storyboard */,
+				3F85D87E1AE83DD900E45E82 /* CommentEditViewController.swift */,
 				3F9656E11A6D8B0A00935320 /* SweetTableViewCell.swift */,
 				3F7AE71C1AE71C4B00A66E68 /* DetailSweetTableViewCell.swift */,
 				3F7AE71E1AE726A400A66E68 /* DetailCommentTableViewCell.swift */,
@@ -304,10 +304,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F85D87F1AE83DD900E45E82 /* CommentEditViewController.swift in Sources */,
 				3F7AE71F1AE726A400A66E68 /* DetailCommentTableViewCell.swift in Sources */,
 				3FD5BD2C1AE6CCFD0008F779 /* DetailTableViewController.swift in Sources */,
 				3F7AE71D1AE71C4B00A66E68 /* DetailSweetTableViewCell.swift in Sources */,
-				3F719EE61A6D68F700D1E00D /* ViewController.swift in Sources */,
 				3F719EE41A6D68F700D1E00D /* AppDelegate.swift in Sources */,
 				3F9656DE1A6D7FD400935320 /* TimeLineTableViewController.swift in Sources */,
 				3F9656E21A6D8B0A00935320 /* SweetTableViewCell.swift in Sources */,

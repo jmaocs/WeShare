@@ -8,14 +8,16 @@
 
 import UIKit
 
-class DetailTableViewController: UITableViewController {
+class DetailTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate {
     
-    var cell: SweetTableViewCell? {
+    var sweet: PFObject? {
         didSet{
             loadData()
         }
     }
+    
     var comments: [PFObject] = []
+    var selectedRow: Int?
     
     func loadData() {
         comments.removeAll(keepCapacity: false)
@@ -27,9 +29,8 @@ class DetailTableViewController: UITableViewController {
             (objects:[AnyObject]!, error:NSError!) ->Void in
             if error == nil {
                 allComments = objects.reverse() as [PFObject]
-                println(allComments)
                 for com in allComments {
-                    if (com.objectForKey("sweet").objectId == self.cell?.sweet?.objectId) {
+                    if (com.objectForKey("sweet").objectId == self.sweet!.objectId) {
                         self.comments.append(com)
                     }
                 }
@@ -41,11 +42,6 @@ class DetailTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
 
     override func didReceiveMemoryWarning() {
@@ -62,77 +58,63 @@ class DetailTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
         if (section == 0) {
             return 1
         } else {
             return self.comments.count
         }
-
     }
 
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         if (indexPath.section == 0) {
             let sweetCell = tableView.dequeueReusableCellWithIdentifier("DetailSweetCell", forIndexPath: indexPath) as SweetTableViewCell
-            sweetCell.sweetTextView!.text = cell!.sweetTextView.text
-            sweetCell.avatarImg!.image = cell!.avatarImg.image
-            sweetCell.usernameLabel!.text = cell!.usernameLabel.text
-            sweetCell.timestampLabel!.text = cell!.timestampLabel.text
+            sweetCell.sweet = self.sweet!
             return sweetCell
         } else {
             let commentCell = tableView.dequeueReusableCellWithIdentifier("DetailCommentCell", forIndexPath: indexPath) as DetailCommentTableViewCell
             commentCell.comment = self.comments[indexPath.row]
+            commentCell.makeOrReplyComment.addTarget(self, action: "makeOrReplyAction:", forControlEvents: UIControlEvents.TouchUpInside)
+            commentCell.makeOrReplyComment.tag = indexPath.row
             return commentCell
         
         }
     }
     
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the specified item to be editable.
-        return true
+    
+    @IBAction func makeOrReplyAction(sender: UIButton) {
+        self.performSegueWithIdentifier("Reply Comment", sender: sender)
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+    
+    private struct Storyboard {
+        static let ReplyCommentIdentifier = "Reply Comment"
+        static let MakeCommentIdentifier = "Make Comment"
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
+        if segue.identifier == Storyboard.ReplyCommentIdentifier {
+            if let cevc = segue.destinationViewController.contentViewController as? CommentEditViewController {
+                if let bt = sender as? UIButton {
+                    cevc.commentToReply = comments[sender!.tag]
+                }
+            }
+        } else if segue.identifier == Storyboard.MakeCommentIdentifier {
+            if let cevc = segue.destinationViewController.contentViewController as? CommentEditViewController {
+                if let bt = sender as? UIButton {
+                    cevc.sweetToReply = self.sweet!
+                }
+            }
+        }
     }
-    */
+}
 
+
+extension UIViewController {
+    var contentViewController: UIViewController {
+        if let navcon = self as? UINavigationController {
+            return navcon.visibleViewController
+        } else {
+            return self
+        }
+    }
 }

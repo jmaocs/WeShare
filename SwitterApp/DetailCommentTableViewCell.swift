@@ -18,6 +18,10 @@ class DetailCommentTableViewCell: UITableViewCell {
     
     @IBOutlet weak var usernameLabel: UILabel! = UILabel()
     
+    @IBOutlet weak var makeOrReplyComment: UIButton!
+    
+  
+    
     
     var comment: PFObject? {
         didSet {
@@ -27,7 +31,6 @@ class DetailCommentTableViewCell: UITableViewCell {
     
     func updateUI() {
         if let comment = self.comment {
-            println(comment.objectForKey("commenter").objectId)
             
             // fetch the commenter
             var findCommenter:PFQuery = PFUser.query()
@@ -45,7 +48,6 @@ class DetailCommentTableViewCell: UITableViewCell {
                             profileImageURL = NSURL(string: "http://images.clipartpanda.com/sad-boy-clipart-little-boy-clip-art-9932.jpg")
                         } else {
                             profileImageURL =  NSURL(string: "http://fc08.deviantart.net/fs70/f/2013/043/6/4/dynasty_warriors_8_wang_yuanji_avatar_icon_by_mayahabee-d5uqwgp.png")
-                            
                         }
                         dispatch_async(dispatch_get_global_queue(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1 ? Int(QOS_CLASS_USER_INITIATED.value) : DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
                             let imageData = NSData(contentsOfURL: profileImageURL!)

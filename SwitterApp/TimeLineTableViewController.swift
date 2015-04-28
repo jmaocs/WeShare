@@ -91,7 +91,8 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     }
     
     private struct Storyboard {
-        static let CellReuseIdentifier = "Tweet"
+        static let MakeCommentIdentifier = "Reply Comment"
+        static let AddSweetIdentifier = "Add Sweet"
         static let DetailIdentifier = "Show Detail"
     }
         
@@ -119,36 +120,42 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     override func tableView(tableView: UITableView?, cellForRowAtIndexPath indexPath: NSIndexPath?) -> UITableViewCell {
         let cell: SweetTableViewCell = tableView!.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath!) as SweetTableViewCell
         let sweet:PFObject = self.timelineData[indexPath!.row] as PFObject
-        
+        cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
         cell.sweet = sweet
+        cell.makeComment.tag = indexPath!.row
+        cell.makeComment.addTarget(self, action: "makeOrReplyAction:", forControlEvents: UIControlEvents.TouchUpInside)
+        
         return cell
     }
 
+    @IBAction func makeOrReplyAction(sender: UIButton) {
+        self.performSegueWithIdentifier("Reply Comment", sender: sender)
+    }
     
     // MARK: - Navitation
     
     override func shouldPerformSegueWithIdentifier(identifier: String?, sender: AnyObject?) -> Bool {
-//        if identifier == Storyboard.MentionsIdentifier {
-//            if let tweetCell = sender as? SweetTableViewCell {
-//                if tweetCell.tweet!.hashtags.count + tweetCell.tweet!.urls.count + tweetCell.tweet!.userMentions.count + tweetCell.tweet!.media.count == 0 {
-//                    return false
-//                }
-//            }
-//        }
         return true
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let identifier = segue.identifier {
-            if identifier == Storyboard.DetailIdentifier {
-                if let dvc = segue.destinationViewController as? DetailTableViewController {
-                    if let tweetCell = sender as? SweetTableViewCell {
-                        dvc.cell = tweetCell
-                        
+        
+        if segue.identifier == Storyboard.DetailIdentifier {
+            if let dvc = segue.destinationViewController as? DetailTableViewController {
+                if let tweetCell = sender as? SweetTableViewCell {
+                    dvc.sweet = tweetCell.sweet!
+                }
+            }
+        } else if (segue.identifier == Storyboard.MakeCommentIdentifier) {
+            if segue.identifier == Storyboard.MakeCommentIdentifier {
+                if let cevc = segue.destinationViewController.contentViewController as? CommentEditViewController {
+                    if let bt = sender as? UIButton {
+                        cevc.sweetToReply = timelineData[sender!.tag]
                     }
                 }
             }
         }
+       
     }
 
 }
