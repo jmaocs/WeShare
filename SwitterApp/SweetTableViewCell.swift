@@ -78,6 +78,7 @@ class SweetTableViewCell: UITableViewCell {
     }
     
     func loadLikes() {
+        // load likes count
         if let likesArr = self.sweet?.objectForKey("likes") as? [PFUser]{
             var count = likesArr.count
             self.likesCountLable.text = String(count)
@@ -85,6 +86,7 @@ class SweetTableViewCell: UITableViewCell {
              self.likesCountLable.text = String(0)
         }
         
+        // load current user like or not
         if (self.isCurUserLike()) {
             self.likesImg.image = UIImage(named: dislike)
         } else {
@@ -102,7 +104,7 @@ class SweetTableViewCell: UITableViewCell {
         
         self.loadLikes()
         
-        self.sweetTextLabel?.text = self.sweet!.objectForKey("content") as NSString
+        self.sweetTextLabel?.text = self.sweet!.objectForKey("content") as? String
         // Configure the cell...
         
         
@@ -150,8 +152,10 @@ class SweetTableViewCell: UITableViewCell {
     func isCurUserLike() -> Bool{
         if let lks = self.sweet?.objectForKey("likes") as?  [PFObject] {
             for each in lks {
-                if each.objectId == PFUser.currentUser().objectId {
-                    return true
+                if let curUser = PFUser.currentUser() {
+                    if each.objectId == curUser.objectId {
+                        return true
+                    }
                 }
             }
         }
