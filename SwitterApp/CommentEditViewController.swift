@@ -12,49 +12,45 @@ class CommentEditViewController: UIViewController,UITextViewDelegate {
     @IBOutlet weak var commentText: UITextView! = UITextView()
     
     var username : NSString?
-
-    var sweetToReply : PFObject? {
-        didSet{
-            queryOriginalSweetAuthor(sweetToReply!)
-        }
-    }
-    var commentToReply : PFObject? {
-        didSet{
-            queryOriginalCommentAuthor(commentToReply!)
-        }
-    }
+    var sweetToReply : PFObject?
+    var commentToReply : PFObject?
     
-    func queryOriginalCommentAuthor(comment: PFObject) {
-        
-        var findCommenter:PFQuery = PFUser.query()
-        findCommenter.whereKey("objectId", equalTo: comment.objectForKey("commenter").objectId)
-        findCommenter.findObjectsInBackgroundWithBlock {
-            (objects:[AnyObject]!, error:NSError!) ->Void in
-            if error == nil {
-                var user:PFUser = (objects! as  NSArray).lastObject as PFUser
-                if let user = (objects! as  NSArray).lastObject as?  PFUser {
-                    var tmp = user.username as NSString
-                    self.username = "@ \(tmp) "
+    func fetchUsername() {
+        if (commentToReply == nil) {
+            self.queryEditor(self.sweetToReply!)
+        } else {
+            self.queryEditor(self.commentToReply!)
+        }
+    }
+    func queryEditor(data: PFObject) {
+        var findEditor:PFQuery = PFUser.query()
+        if let id = data.objectForKey("editor")?.objectId {
+            findEditor.getObjectInBackgroundWithId(id, block: {
+                (result :PFObject!,error : NSError!) -> Void in
+                if let res = result as? PFUser {
+                    self.username = "@\(res.username) \n"
+                    
+                    //  get comment content
+                    var mutableStr = NSMutableAttributedString(string: self.username! as NSString, attributes: [NSFontAttributeName:UIFont(name: "Georgia", size: 17.0)!,
+                        NSForegroundColorAttributeName:UIColor.blueColor()])
+                    self.commentText.attributedText = mutableStr
+                    
+//                    self.updateCommentTextLabel()
                 }
-            }
+            })
         }
     }
-    
-    func queryOriginalSweetAuthor(sweet: PFObject) {
-        var findOriginalAuthor:PFQuery = PFUser.query()
-        findOriginalAuthor.whereKey("objectId", equalTo: sweet.objectForKey("sweeter").objectId)
-        findOriginalAuthor.findObjectsInBackgroundWithBlock{
-            (objects:[AnyObject]!, error:NSError!) ->Void in
-            if error == nil {
-                var user:PFUser = (objects! as  NSArray).lastObject as PFUser
-                if let user = (objects! as  NSArray).lastObject as?  PFUser {
-                    self.username = "@ \(user.username!) "
-                }
-            }
-        }
-    }
-    
 
+    func updateCommentTextLabel() {
+        // get comment content
+        if let username = self.username {
+            var mutableStr = NSMutableAttributedString(string: username)
+            let coloredStr :NSString = username
+            mutableStr.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: NSRange(location: 0, length: coloredStr.length))
+            self.commentText.attributedText = mutableStr
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         commentText.delegate = self
@@ -62,7 +58,7 @@ class CommentEditViewController: UIViewController,UITextViewDelegate {
     }
     
     override func viewDidAppear(animated: Bool) {
-        self.commentText.text = self.username!
+        self.fetchUsername()
     }
 
     override func didReceiveMemoryWarning() {
@@ -82,23 +78,24 @@ class CommentEditViewController: UIViewController,UITextViewDelegate {
 
     @IBAction func send(sender: UIBarButtonItem) {
         presentingViewController?.dismissViewControllerAnimated(true, completion: nil)
-        
         saveComment()
     }
-    
+
     func saveComment() {
         var comment:PFObject = PFObject(className: "Comment")
         comment["content"] = commentText.text
-        comment["commenter"] = PFUser.currentUser()
         if let st = sweetToReply {
             comment["sweet"] = st
         }
         if let ct = commentToReply {
             comment["commentReplied"] = ct
         }
-        comment["commenter"] = PFUser.currentUser()
+        comment["editor"] = PFUser.currentUser()
+        self.sweetToReply!.addUniqueObject(comment, forKey: "comments")
+        self.sweetToReply?.saveInBackground()
         comment.saveInBackgroundWithTarget(nil, selector: nil)
     }
+    
     /*
     // MARK: - Navigation
 

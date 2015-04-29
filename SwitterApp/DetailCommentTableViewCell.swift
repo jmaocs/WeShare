@@ -13,14 +13,13 @@ class DetailCommentTableViewCell: UITableViewCell {
     @IBOutlet weak var avatarImg: UIImageView! = UIImageView()
 
     @IBOutlet weak var timestampLabel: UILabel! = UILabel()
-
-    @IBOutlet weak var commentText: UITextView! = UITextView()
     
     @IBOutlet weak var usernameLabel: UILabel! = UILabel()
     
     @IBOutlet weak var makeOrReplyComment: UIButton!
     
   
+    @IBOutlet weak var commentTextLabel: UILabel! = UILabel()
     
     
     var comment: PFObject? {
@@ -29,41 +28,56 @@ class DetailCommentTableViewCell: UITableViewCell {
         }
     }
     
+    var editor : PFUser?
+    
+    func fetchEditor() {
+        var findEditor:PFQuery = PFUser.query()
+        if let id = self.comment!.objectForKey("editor")?.objectId {
+            findEditor.getObjectInBackgroundWithId(id, block: {
+                (result :PFObject!,error : NSError!) -> Void in
+                if let res = result as? PFUser {
+                    self.editor = res
+                    self.updateUserInfo()
+                }
+            })
+        }
+    }
+    
+    func updateUserInfo() {
+        if let res = self.editor {
+            self.usernameLabel.text = res.username
+            
+            // get profile images
+            if let gender = res.objectForKey("gender") as? NSObject {
+                if (gender == true) {
+                    self.avatarImg?.image = UIImage(named: "boy.jpg")
+                } else {
+                    self.avatarImg?.image = UIImage(named: "girl.png")
+                }
+            } else {
+                self.avatarImg?.image = UIImage(named: "anonymous.png")
+            }
+            
+            updateCommentTextLabel(res)
+        }
+    }
+    
+    func updateCommentTextLabel(user: PFUser) {
+        // get comment content
+        var mutableStr = NSMutableAttributedString(string: self.comment?.objectForKey("content") as NSString)
+        if let username = user.username {
+            let coloredStr :NSString = username
+            mutableStr.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: NSRange(location: 0, length: coloredStr.length+1))
+        }
+        self.commentTextLabel.attributedText = mutableStr
+    }
+    
     func updateUI() {
         if let comment = self.comment {
             
             // fetch the commenter
-            var findCommenter:PFQuery = PFUser.query()
-            findCommenter.whereKey("objectId", equalTo: comment.objectForKey("commenter").objectId)
-            findCommenter.findObjectsInBackgroundWithBlock{
-                (objects:[AnyObject]!, error:NSError!) ->Void in
-                if error == nil {
-                    var user:PFUser = (objects! as  NSArray).lastObject as PFUser
-                    if let user = (objects! as  NSArray).lastObject as?  PFUser {
-                        self.usernameLabel.text = user.username
-                        
-                        // get profile images
-                        var profileImageURL: NSURL?
-                        if (user.objectForKey("gender") as NSObject == true) {  // male
-                            profileImageURL = NSURL(string: "http://images.clipartpanda.com/sad-boy-clipart-little-boy-clip-art-9932.jpg")
-                        } else {
-                            profileImageURL =  NSURL(string: "http://fc08.deviantart.net/fs70/f/2013/043/6/4/dynasty_warriors_8_wang_yuanji_avatar_icon_by_mayahabee-d5uqwgp.png")
-                        }
-                        dispatch_async(dispatch_get_global_queue(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1 ? Int(QOS_CLASS_USER_INITIATED.value) : DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
-                            let imageData = NSData(contentsOfURL: profileImageURL!)
-                            dispatch_async(dispatch_get_main_queue()) {
-                                if imageData != nil {
-                                    self.avatarImg?.image = UIImage(data: imageData!)
-                                }
-                            }
-                        }
-                    }
+            self.fetchEditor()
 
-                }
-            }
-
-            
-            
             // get comment time
 //            let dateFormatter:NSDateFormatter = NSDateFormatter()
 //            dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -77,11 +91,8 @@ class DetailCommentTableViewCell: UITableViewCell {
             }
             self.timestampLabel.text = formatter.stringFromDate(comment.createdAt)
             
-            // get comment content
-            self.commentText.text = comment.objectForKey("content") as NSString
             
-            
-            
+
         }
     }
     

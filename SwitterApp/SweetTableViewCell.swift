@@ -7,7 +7,7 @@
 //
 
 import UIKit
-//import ParseUI
+
 
 class SweetTableViewCell: UITableViewCell {
 
@@ -15,34 +15,100 @@ class SweetTableViewCell: UITableViewCell {
     
     @IBOutlet weak var timestampLabel: UILabel! = UILabel()
     
-    @IBOutlet weak var sweetTextView: UITextView! = UITextView()
-    
     @IBOutlet weak var avatarImg: UIImageView! = UIImageView()
     
     @IBOutlet weak var comentCountLabel: UILabel!  = UILabel()
 
-    @IBOutlet weak var commentLabel: UILabel! = UILabel()
     
     @IBOutlet weak var makeComment: UIButton! = UIButton()
     
+    @IBOutlet weak var sweetTextLabel: UILabel! = UILabel()
+
+    
+    @IBOutlet weak var likesImg: UIImageView!
+    
+    @IBOutlet weak var likesCountLable: UILabel!
+    
+    var like = "like.png"
+    var dislike = "dislike.png"
     
     var sweet :PFObject? {
         didSet {
             updateUI()
         }
     }
+    
+    
+    
+    var editor : PFUser?
+    
+    func fetchEditor() {
+        var findEditor:PFQuery = PFUser.query()
+        if let id = self.sweet!.objectForKey("editor")?.objectId {
+            findEditor.getObjectInBackgroundWithId(id, block: {
+                (result :PFObject!,error : NSError!) -> Void in
+                if let res = result as? PFUser {
+                    self.editor = res
+                    self.updateUserInfo()
+                }
+            })
+        }
+    }
+    func updateUserInfo() {
+        if let user = self.editor {
+            self.usernameLabel.text = user.username
+            UIView.animateWithDuration(1, animations: {
+                self.sweetTextLabel.alpha = 1
+                self.timestampLabel.alpha = 1
+                self.usernameLabel.alpha = 1
+            })
 
+            // get profile images
+            if let gender = user.objectForKey("gender") as? NSObject {
+                if (gender == true) {
+                    self.avatarImg?.image = UIImage(named: "boy.jpg")
+                } else {
+                    self.avatarImg?.image = UIImage(named: "girl.png")
+                }
+            } else {
+                self.avatarImg?.image = UIImage(named: "anonymous.png")
+            }
+            
+        }
+    }
+    
+    func loadLikes() {
+        if let likesArr = self.sweet?.objectForKey("likes") as? [PFUser]{
+            var count = likesArr.count
+            self.likesCountLable.text = String(count)
+        } else {
+             self.likesCountLable.text = String(0)
+        }
+        
+        if (self.isCurUserLike()) {
+            self.likesImg.image = UIImage(named: dislike)
+        } else {
+            self.likesImg.image = UIImage(named: like)
+        }
+    }
+    
     func updateUI() {
-        self.sweetTextView.alpha = 0
+
+        
+        self.sweetTextLabel.numberOfLines = 0
+        self.sweetTextLabel.alpha = 0
         self.timestampLabel.alpha = 0
         self.usernameLabel.alpha = 0
         
-        self.comentCountLabel.text = "5"
-        self.commentLabel.text = "Comment"
+        self.loadLikes()
         
-        self.sweetTextView.text = self.sweet!.objectForKey("content") as NSString
+        self.sweetTextLabel?.text = self.sweet!.objectForKey("content") as NSString
         // Configure the cell...
-        var findSweeter:PFQuery = PFUser.query()
+        
+        
+        self.fetchEditor()
+        
+        
         
         //        let dateFormatter:NSDateFormatter = NSDateFormatter()
         //        dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -57,48 +123,47 @@ class SweetTableViewCell: UITableViewCell {
         
         
         self.timestampLabel.text = formatter.stringFromDate(self.sweet!.createdAt)
-        findSweeter.whereKey("objectId", equalTo: self.sweet!.objectForKey("sweeter").objectId)
-        findSweeter.findObjectsInBackgroundWithBlock{
-            (objects:[AnyObject]!, error:NSError!) ->Void in
-            if error == nil {
-                var user:PFUser = (objects! as  NSArray).lastObject as PFUser
-                if let user = (objects! as  NSArray).lastObject as?  PFUser {
-                    self.usernameLabel.text = user.username
-                    UIView.animateWithDuration(1, animations: {
-                        self.sweetTextView.alpha = 1
-                        self.timestampLabel.alpha = 1
-                        self.usernameLabel.alpha = 1
-                    })
-                    
-                    // get profile images
-                    var profileImageURL: NSURL?
-                    if (user.objectForKey("gender") as NSObject == true) {  // male
-                        profileImageURL = NSURL(string: "http://images.clipartpanda.com/sad-boy-clipart-little-boy-clip-art-9932.jpg")
-                    } else {
-                        profileImageURL =  NSURL(string: "http://fc08.deviantart.net/fs70/f/2013/043/6/4/dynasty_warriors_8_wang_yuanji_avatar_icon_by_mayahabee-d5uqwgp.png")
-                        
-                    }
-                    dispatch_async(dispatch_get_global_queue(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1 ? Int(QOS_CLASS_USER_INITIATED.value) : DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
-                        let imageData = NSData(contentsOfURL: profileImageURL!)
-                        dispatch_async(dispatch_get_main_queue()) {
-                            if imageData != nil {
-                                self.avatarImg?.image = UIImage(data: imageData!)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    
     }
     
     
+    func likesAction(gesture: UIGestureRecognizer) {
+        if let likesImg = gesture.view  as? UIImageView {
+            if (self.isCurUserLike()) {     // already liked
+                self.sweet?.removeObject(PFUser.currentUser(), forKey: "likes")
+                self.likesImg.image = UIImage(named: like)
+            } else {
+                self.sweet?.addUniqueObject(PFUser.currentUser(), forKey: "likes")
+                self.likesImg.image = UIImage(named: dislike)
+            }
+            
+            self.sweet?.saveInBackground()
+            
+            if let likesArr = self.sweet?.objectForKey("likes") as? [PFUser]{
+                var count = likesArr.count
+                self.likesCountLable.text = String(count)
+            } else {
+                self.likesCountLable.text = String(0)
+            }
+        }
+    }
+    
+    func isCurUserLike() -> Bool{
+        if let lks = self.sweet?.objectForKey("likes") as?  [PFObject] {
+            for each in lks {
+                if each.objectId == PFUser.currentUser().objectId {
+                    return true
+                }
+            }
+        }
+        return false
+    }
     
     
     override func awakeFromNib() {
         super.awakeFromNib()
-//        accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+        let tapGesture = UITapGestureRecognizer(target: self, action: "likesAction:")
+        likesImg.addGestureRecognizer(tapGesture)
+        likesImg.userInteractionEnabled = true
     }
 
     override func setSelected(selected: Bool, animated: Bool) {

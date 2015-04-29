@@ -17,33 +17,48 @@ class DetailTableViewController: UITableViewController, UIPopoverPresentationCon
     }
     
     var comments: [PFObject] = []
-    var selectedRow: Int?
+    var countsOfComments : Int?
     
     func loadData() {
         comments.removeAll(keepCapacity: false)
-        
-        var allComments: [PFObject] = []
-        
-        var findAllComments: PFQuery = PFQuery(className: "Comment")    // load all comments
-        findAllComments.findObjectsInBackgroundWithBlock {
-            (objects:[AnyObject]!, error:NSError!) ->Void in
-            if error == nil {
-                allComments = objects.reverse() as [PFObject]
-                for com in allComments {
-                    if (com.objectForKey("sweet").objectId == self.sweet!.objectId) {
-                        self.comments.append(com)
+        if let cts = self.sweet?.objectForKey("comments") as?  [PFObject] {
+            cts.reverse()
+            for each in cts {
+                var findComment: PFQuery = PFQuery(className: "Comment")    // load all comments
+                findComment.getObjectInBackgroundWithId(each.objectId) {
+                    (result: PFObject!, error: NSError!) -> Void in
+                    if !(error != nil) {
+                        if let res = result {
+                            self.comments.append(res)
+                            self.countsOfComments = self.comments.count
+                            self.tableView.reloadData()
+                        }
                     }
                 }
-                self.tableView.reloadData()
             }
         }
-        
+
+    }
+    
+    func refresh() {
+        if refreshControl != nil {
+            refreshControl?.beginRefreshing()
+        }
+        refresh(refreshControl!)
+    }
+    
+    @IBAction func refresh(sender: UIRefreshControl) {
+        self.loadData()
+        sender.endRefreshing()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 
+    override func viewDidAppear(animated: Bool) {
+        self.loadData()
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -70,14 +85,21 @@ class DetailTableViewController: UITableViewController, UIPopoverPresentationCon
         if (indexPath.section == 0) {
             let sweetCell = tableView.dequeueReusableCellWithIdentifier("DetailSweetCell", forIndexPath: indexPath) as SweetTableViewCell
             sweetCell.sweet = self.sweet!
+            if let counts = self.countsOfComments {
+                sweetCell.comentCountLabel.text = String(counts)
+            } else {
+                sweetCell.comentCountLabel.text = String(0)
+            }
             return sweetCell
         } else {
             let commentCell = tableView.dequeueReusableCellWithIdentifier("DetailCommentCell", forIndexPath: indexPath) as DetailCommentTableViewCell
+            if (self.comments.count == 0) {
+                return commentCell
+            }
             commentCell.comment = self.comments[indexPath.row]
             commentCell.makeOrReplyComment.addTarget(self, action: "makeOrReplyAction:", forControlEvents: UIControlEvents.TouchUpInside)
             commentCell.makeOrReplyComment.tag = indexPath.row
             return commentCell
-        
         }
     }
     
@@ -96,6 +118,7 @@ class DetailTableViewController: UITableViewController, UIPopoverPresentationCon
             if let cevc = segue.destinationViewController.contentViewController as? CommentEditViewController {
                 if let bt = sender as? UIButton {
                     cevc.commentToReply = comments[sender!.tag]
+                    cevc.sweetToReply = self.sweet!
                 }
             }
         } else if segue.identifier == Storyboard.MakeCommentIdentifier {

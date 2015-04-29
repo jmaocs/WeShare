@@ -13,8 +13,18 @@ import ParseUI
 class TimeLineTableViewController: UITableViewController, PFLogInViewControllerDelegate, PFSignUpViewControllerDelegate {
 
     var timelineData = [PFObject]()
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.refresh()
+//        PFUser.logOut()
+        
+        //        PFUser.enableAutomaticUser()    // able to create a random user
+        if ((PFUser.currentUser()) == nil) {
+            self.createAnAnonymousUser()
+        }
+        
 //        if NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1 {
 //            tableView.estimatedRowHeight = tableView.rowHeight
 //            tableView.rowHeight = UITableViewAutomaticDimension
@@ -22,6 +32,10 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     }
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        self.loadData()
     }
     
     // loading all sweets from database
@@ -40,55 +54,37 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    func createAnAnonymousUser() {
+        // create an anonymous user
+        var user = PFUser()
+        user.username = "Jing"
+        user.password = "12345"
+//        user.setValue(true, forKey: "gender")
         
-        self.loadData()
-//        PFUser.logOut()
-        
-        // create an random user
-        PFUser.enableAutomaticUser()
-        PFUser.currentUser().username = "Jing"
-        PFUser.currentUser().saveInBackground()
-        
-        var login: PFLogInView
-        
-        if ((PFUser.currentUser()) == nil) {
-            var loginAlert:UIAlertController = UIAlertController(title: "Sign Up / Login", message: "Please sign up or login", preferredStyle:UIAlertControllerStyle.Alert)
-            loginAlert.addTextFieldWithConfigurationHandler({
-                textfield in
-                textfield.placeholder = "Your username"
-            })
-            
-            loginAlert.addTextFieldWithConfigurationHandler({
-                textfield in
-                textfield.placeholder = "Your password"
-                textfield.secureTextEntry = true
-            })
-            
-            loginAlert.addAction(UIAlertAction(title: "Sign Up", style: UIAlertActionStyle.Default, handler: {
-                    alertAction in
-                let textFields:NSArray = loginAlert.textFields! as NSArray
-                let usernameTextfield:UITextField = textFields.objectAtIndex(0) as UITextField
-                let passwordTextfield:UITextField = textFields.objectAtIndex(1) as UITextField
-                
-                var sweeter: PFUser = PFUser()
-                sweeter.username = usernameTextfield.text
-                sweeter.password = passwordTextfield.text
-                
-                sweeter.signUpInBackgroundWithBlock{
-                    (success:Bool!, error:NSError!) -> Void in
-                    if !(error != nil) {
-                        println("Sign up successfull")
-                    } else {
-                        let errorString = error.userInfo!["error"] as NSString
-                        println(errorString)
-                    }
-                }
-                
-            }))
-            self.presentViewController(loginAlert, animated: true, completion: nil)
+        user.signUpInBackgroundWithBlock {
+            (succeeded: Bool?, error: NSError?) -> Void in
+            if let error = error {
+                let errorString = error.userInfo?["error"] as? NSString
+            } else {
+                println("user \(user.username) sign up")
+            }
         }
     }
+    
+    
+    func refresh() {
+        if refreshControl != nil {
+            refreshControl?.beginRefreshing()
+        }
+        refresh(refreshControl!)
+    }
+    
+    @IBAction func refresh(sender: UIRefreshControl) {
+        self.loadData()
+
+        sender.endRefreshing()
+    }
+
     
     private struct Storyboard {
         static let MakeCommentIdentifier = "Reply Comment"
@@ -119,9 +115,20 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     
     override func tableView(tableView: UITableView?, cellForRowAtIndexPath indexPath: NSIndexPath?) -> UITableViewCell {
         let cell: SweetTableViewCell = tableView!.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath!) as SweetTableViewCell
-        let sweet:PFObject = self.timelineData[indexPath!.row] as PFObject
+        if (self.timelineData.count == 0) {
+            return cell
+        }
+        let sweet = self.timelineData[indexPath!.row]
+        
         cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
         cell.sweet = sweet
+        
+        if let comments = sweet.objectForKey("comments") as?  NSArray{
+            cell.comentCountLabel.text = String(comments.count)
+        } else {
+            cell.comentCountLabel.text = String(0)
+        }
+        
         cell.makeComment.tag = indexPath!.row
         cell.makeComment.addTarget(self, action: "makeOrReplyAction:", forControlEvents: UIControlEvents.TouchUpInside)
         
@@ -157,5 +164,47 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
         }
        
     }
+    
+    
+    /********************************************************************************************/
+    // Log In
+    func login() {
+        var login: PFLogInView
+        var loginAlert:UIAlertController = UIAlertController(title: "Sign Up / Login", message: "Please sign up or login", preferredStyle:UIAlertControllerStyle.Alert)
+        loginAlert.addTextFieldWithConfigurationHandler({
+            textfield in
+            textfield.placeholder = "Your username"
+        })
+        
+        loginAlert.addTextFieldWithConfigurationHandler({
+            textfield in
+            textfield.placeholder = "Your password"
+            textfield.secureTextEntry = true
+        })
+        
+        loginAlert.addAction(UIAlertAction(title: "Sign Up", style: UIAlertActionStyle.Default, handler: {
+            alertAction in
+            let textFields:NSArray = loginAlert.textFields! as NSArray
+            let usernameTextfield:UITextField = textFields.objectAtIndex(0) as UITextField
+            let passwordTextfield:UITextField = textFields.objectAtIndex(1) as UITextField
+            
+            var sweeter: PFUser = PFUser()
+            sweeter.username = usernameTextfield.text
+            sweeter.password = passwordTextfield.text
+            
+            sweeter.signUpInBackgroundWithBlock {
+                (success:Bool!, error:NSError!) -> Void in
+                if !(error != nil) {
+                    println("Sign up successfull")
+                } else {
+                    let errorString = error.userInfo!["error"] as NSString
+                    println(errorString)
+                }
+            }
+            
+        }))
+        self.presentViewController(loginAlert, animated: true, completion: nil)
+    }
+
 
 }

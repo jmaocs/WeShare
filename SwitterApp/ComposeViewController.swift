@@ -37,7 +37,7 @@ class ComposeViewController: UIViewController, UITextViewDelegate {
     @IBAction func sendSweet(sender: AnyObject) {
         var sweet:PFObject = PFObject(className: "Sweets")
         sweet["content"] = sweetTextView.text
-        sweet["sweeter"] = PFUser.currentUser()
+        sweet["editor"] = PFUser.currentUser()
         sweet.saveInBackgroundWithTarget(nil, selector: nil)
         self.navigationController?.popToRootViewControllerAnimated(true)
         
