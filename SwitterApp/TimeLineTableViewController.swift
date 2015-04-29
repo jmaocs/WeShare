@@ -49,8 +49,10 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
         findTimelineData.findObjectsInBackgroundWithBlock {
             (objects:[AnyObject]!, error:NSError!) ->Void in
             if error == nil {
-                self.timelineData = objects.reverse() as! [PFObject]
-                self.tableView.reloadData()
+                if let objArr = objects.reverse() as? [PFObject] {
+                    self.timelineData = objArr
+                    self.tableView.reloadData()
+                }
             }
         }
     }
@@ -115,7 +117,7 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
 
     
     override func tableView(tableView: UITableView?, cellForRowAtIndexPath indexPath: NSIndexPath?) -> UITableViewCell {
-        let cell: SweetTableViewCell = tableView!.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath!) as! SweetTableViewCell
+        var cell: SweetTableViewCell = tableView!.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath!) as SweetTableViewCell
         if (self.timelineData.count == 0) {
             return cell
         }
@@ -134,6 +136,7 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
         cell.makeComment.addTarget(self, action: "makeOrReplyAction:", forControlEvents: UIControlEvents.TouchUpInside)
         
         return cell
+        
     }
 
     @IBAction func makeOrReplyAction(sender: UIButton) {
@@ -189,24 +192,25 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
             alertAction in
             
             let textFields:NSArray = loginAlert.textFields! as NSArray
-            let usernameTextfield:UITextField = textFields.objectAtIndex(0) as! UITextField
-            let passwordTextfield:UITextField = textFields.objectAtIndex(1) as! UITextField
-            
-            var sweeter: PFUser = PFUser()
-            sweeter.username = usernameTextfield.text
-            sweeter.password = passwordTextfield.text
-            
-//            sweeter.signUpInBackgroundWithBlock
-//            {
-//                (succeeded:Bool!, error:NSError!) -> Void in
-//                if !(error != nil) {
-////                    println("Sign up successfull")
-//                } else {
-////                    let errorString = error.userInfo!["error"] as! NSString
-////                    println(errorString)
-//                }
-//                
-//            }
+            if let usernameTextfield:UITextField = textFields.objectAtIndex(0) as? UITextField {
+                if let passwordTextfield:UITextField = textFields.objectAtIndex(1) as? UITextField {
+                    var sweeter: PFUser = PFUser()
+                    sweeter.username = usernameTextfield.text
+                    sweeter.password = passwordTextfield.text
+                    sweeter.signUpInBackgroundWithBlock
+                    {
+                        (succeeded:Bool!, error:NSError!) -> Void in
+                        if !(error != nil) {
+                            println("Sign up successfull")
+                        } else {
+                            if let errorString = error.userInfo!["error"] as? NSString {
+                                println(errorString)
+                            }
+                        }
+                        
+                    }
+                }
+            }
             
          }))
         

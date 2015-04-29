@@ -64,13 +64,14 @@ class DetailCommentTableViewCell: UITableViewCell {
     
     func updateCommentTextLabel(user: PFUser) {
         // get comment content
-        let contentStr = self.comment?.objectForKey("content") as! String
-        var mutableStr = NSMutableAttributedString(string: contentStr)
-        if let username = user.username {
-            let coloredStr :NSString = username
-            mutableStr.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: NSRange(location: 0, length: coloredStr.length+1))
+        if let contentStr = self.comment?.objectForKey("content") as? String {
+            var mutableStr = NSMutableAttributedString(string: contentStr)
+            if let username = user.username {
+                let coloredStr :NSString = username
+                mutableStr.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: NSRange(location: 0, length: coloredStr.length+1))
+            }
+            self.commentTextLabel.attributedText = mutableStr
         }
-        self.commentTextLabel.attributedText = mutableStr
     }
     
     func updateUI() {

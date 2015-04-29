@@ -31,26 +31,16 @@ class CommentEditViewController: UIViewController,UITextViewDelegate {
                     self.username = "@\(res.username) \n"
                     
                     //  get comment content
-                    let name = self.username as! String
-                    var mutableStr = NSMutableAttributedString(string: name, attributes: [NSFontAttributeName:UIFont(name: "Georgia", size: 17.0)!,
-                        NSForegroundColorAttributeName:UIColor.blueColor()])
-                    self.commentText.attributedText = mutableStr
-                    
-//                    self.updateCommentTextLabel()
+                    if let name = self.username as? String {
+                        var mutableStr = NSMutableAttributedString(string: name, attributes: [NSFontAttributeName:UIFont(name: "Georgia", size: 17.0)!,
+                            NSForegroundColorAttributeName:UIColor.blueColor()])
+                        self.commentText.attributedText = mutableStr
+                    }
                 }
             })
         }
     }
-//
-//    func updateCommentTextLabel() {
-//        // get comment content
-//        if let username = self.username {
-//            var mutableStr = NSMutableAttributedString(string: username)
-//            let coloredStr :NSString = username
-//            mutableStr.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: NSRange(location: 0, length: coloredStr.length))
-//            self.commentText.attributedText = mutableStr
-//        }
-//    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
