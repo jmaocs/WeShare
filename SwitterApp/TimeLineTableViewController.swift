@@ -12,17 +12,25 @@ import ParseUI
 
 class TimeLineTableViewController: UITableViewController, PFLogInViewControllerDelegate, PFSignUpViewControllerDelegate {
 
+    
     var timelineData = [PFObject]()
 
+    @IBAction func logout(sender: AnyObject) {
+        PFUser.logOut()
+        self.presentViewController(loginAlert, animated: true, completion: nil)
+    }
+//    var login: PFLogInView
+    var loginAlert:UIAlertController = UIAlertController(title: "Sign Up / Login",
+        message: "Please sign up or login", preferredStyle:UIAlertControllerStyle.Alert)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        PFUser.logOut()
         
 //        PFUser.enableAutomaticUser()    // able to create a random user
         if ((PFUser.currentUser()) == nil) {
-            self.createAnAnonymousUser()
+//            self.createAnAnonymousUser()
+            self.logIn()
         }
         self.refresh()
         
@@ -40,7 +48,7 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     }
     
     // loading all sweets from database
-    @IBAction func loadData() {
+    func loadData() {
         
         timelineData.removeAll(keepCapacity: false)
         
@@ -172,10 +180,8 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     
     /********************************************************************************************/
     // Log In
-    func login() {
-        var login: PFLogInView
-        var loginAlert:UIAlertController = UIAlertController(title: "Sign Up / Login",
-            message: "Please sign up or login", preferredStyle:UIAlertControllerStyle.Alert)
+    func logIn() {
+        
         
         loginAlert.addTextFieldWithConfigurationHandler({
             textfield in
@@ -191,7 +197,7 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
         loginAlert.addAction(UIAlertAction(title: "Sign Up", style: UIAlertActionStyle.Default, handler: {
             alertAction in
             
-            let textFields:NSArray = loginAlert.textFields! as NSArray
+            let textFields:NSArray = self.loginAlert.textFields! as NSArray
             if let usernameTextfield:UITextField = textFields.objectAtIndex(0) as? UITextField {
                 if let passwordTextfield:UITextField = textFields.objectAtIndex(1) as? UITextField {
                     var sweeter: PFUser = PFUser()
@@ -203,8 +209,9 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
                         if !(error != nil) {
                             println("Sign up successfull")
                         } else {
-                            if let errorString = error.userInfo!["error"] as? NSString {
+                            if let errorString = error.userInfo?["error"] as? NSString {
                                 println(errorString)
+                                println("Please log in")
                             }
                         }
                         
@@ -213,6 +220,33 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
             }
             
          }))
+        
+        loginAlert.addAction(UIAlertAction(title: "Log In", style: UIAlertActionStyle.Default, handler: {
+            alertAction in
+            
+            let textFields:NSArray = self.loginAlert.textFields! as NSArray
+            if let usernameTextfield:UITextField = textFields.objectAtIndex(0) as? UITextField {
+                if let passwordTextfield:UITextField = textFields.objectAtIndex(1) as? UITextField {
+                    var sweeter: PFUser = PFUser()
+                    sweeter.username = usernameTextfield.text
+                    sweeter.password = passwordTextfield.text
+                    sweeter.signUpInBackgroundWithBlock
+                    {
+                        (succeeded:Bool!, error:NSError!) -> Void in
+                        if !(error != nil) {
+                            println("Sign up successfull")
+                        } else {
+                            if let errorString = error.userInfo?["error"] as? NSString {
+                                println(errorString)
+                                println("Please log in")
+                            }
+                        }
+                            
+                    }
+                }
+            }
+            
+        }))
         
         self.presentViewController(loginAlert, animated: true, completion: nil)
     }

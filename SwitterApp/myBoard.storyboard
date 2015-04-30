@@ -147,9 +147,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="B6f-0m-iFF">
-                        <barButtonItem key="leftBarButtonItem" systemItem="refresh" id="o4X-dY-FJo">
+                        <barButtonItem key="leftBarButtonItem" title="Logout" id="o4X-dY-FJo">
                             <connections>
-                                <action selector="loadData" destination="QEN-tZ-pwU" id="0in-81-OIu"/>
+                                <action selector="logout:" destination="QEN-tZ-pwU" id="zh3-Up-eWO"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="plX-c9-W1M">
@@ -577,6 +577,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="qGb-sp-B4z"/>
+        <segue reference="2Z7-mK-Iud"/>
     </inferredMetricsTieBreakers>
 </document>
