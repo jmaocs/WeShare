@@ -24,7 +24,7 @@ class TimeLineTableViewController: UITableViewController, UINavigationController
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        self.imageAction()
+        
         // Config for signup
         signUpViewController.fields = (PFSignUpFields.UsernameAndPassword
             | PFSignUpFields.SignUpButton
@@ -104,7 +104,7 @@ class TimeLineTableViewController: UITableViewController, UINavigationController
 
     
     override func tableView(tableView: UITableView?, cellForRowAtIndexPath indexPath: NSIndexPath?) -> UITableViewCell {
-        var cell: SweetTableViewCell = tableView!.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath!) as SweetTableViewCell
+        var cell: SweetTableViewCell = tableView!.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath!) as! SweetTableViewCell
         if (self.timelineData.count == 0) {
             return cell
         }
@@ -159,36 +159,36 @@ class TimeLineTableViewController: UITableViewController, UINavigationController
     
     /********************************************************************************************/
     // Image picker
-    func imagePickerController(picker: UIImagePickerController!, didFinishPickingMediaWithInfo info: NSDictionary!) {
-        let pickedImage:UIImage = info.objectForKey(UIImagePickerControllerOriginalImage) as UIImage
-        
-        // Scale down image
-        let scaledImage = self.scaleImageWith(pickedImage, newSize: CGSizeMake(100, 100))
-        
-        let imageData = UIImagePNGRepresentation(pickedImage)
-        let imageFile:PFFile = PFFile(data: imageData)
-        
-        PFUser.currentUser().setObject(imageFile, forKey: "profileImage")
-        PFUser.currentUser().saveInBackground()
-        
-        picker.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    func scaleImageWith(image:UIImage, newSize:CGSize)->UIImage {
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
-        image.drawInRect(CGRectMake(0, 0, newSize.width, newSize.height))
-        var newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return newImage
-    }
-    
-    func imageAction() {
-        var imagePicker:UIImagePickerController = UIImagePickerController()
-        imagePicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
-        imagePicker.delegate = self
-        println("image")
-        self.presentViewController(imagePicker, animated: true, completion: nil)
-    }
+//    func imagePickerController(picker: UIImagePickerController!, didFinishPickingMediaWithInfo info: NSDictionary!) {
+//        let pickedImage:UIImage = info.objectForKey(UIImagePickerControllerOriginalImage) as! UIImage
+//        
+//        // Scale down image
+//        let scaledImage = self.scaleImageWith(pickedImage, newSize: CGSizeMake(100, 100))
+//        
+//        let imageData = UIImagePNGRepresentation(pickedImage)
+//        let imageFile:PFFile = PFFile(data: imageData)
+//        
+//        PFUser.currentUser().setObject(imageFile, forKey: "profileImage")
+//        PFUser.currentUser().saveInBackground()
+//        
+//        picker.dismissViewControllerAnimated(true, completion: nil)
+//    }
+//    
+//    func scaleImageWith(image:UIImage, newSize:CGSize)->UIImage {
+//        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+//        image.drawInRect(CGRectMake(0, 0, newSize.width, newSize.height))
+//        var newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext()
+//        return newImage
+//    }
+//    
+//    func imageAction() {
+//        var imagePicker:UIImagePickerController = UIImagePickerController()
+//        imagePicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+//        imagePicker.delegate = self
+//        println("image")
+//        self.presentViewController(imagePicker, animated: true, completion: nil)
+//    }
     
     
     /********************************************************************************************/

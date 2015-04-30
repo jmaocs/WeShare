@@ -82,7 +82,7 @@ class DetailTableViewController: UITableViewController, UIPopoverPresentationCon
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         if (indexPath.section == 0) {
-            let sweetCell = tableView.dequeueReusableCellWithIdentifier("DetailSweetCell", forIndexPath: indexPath) as SweetTableViewCell
+            let sweetCell = tableView.dequeueReusableCellWithIdentifier("DetailSweetCell", forIndexPath: indexPath) as! SweetTableViewCell
             sweetCell.sweet = self.sweet!
             if let counts = self.countsOfComments {
                 sweetCell.comentCountLabel.text = String(counts)
@@ -91,7 +91,7 @@ class DetailTableViewController: UITableViewController, UIPopoverPresentationCon
             }
             return sweetCell
         } else {
-            let commentCell = tableView.dequeueReusableCellWithIdentifier("DetailCommentCell", forIndexPath: indexPath) as DetailCommentTableViewCell
+            let commentCell = tableView.dequeueReusableCellWithIdentifier("DetailCommentCell", forIndexPath: indexPath) as! DetailCommentTableViewCell
             if (self.comments.count == 0) {
                 return commentCell
             }
