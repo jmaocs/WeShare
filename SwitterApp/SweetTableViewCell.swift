@@ -95,8 +95,7 @@ class SweetTableViewCell: UITableViewCell {
     }
     
     func updateUI() {
-
-        
+   
         self.sweetTextLabel.numberOfLines = 0
         self.sweetTextLabel.alpha = 0
         self.timestampLabel.alpha = 0
@@ -109,9 +108,7 @@ class SweetTableViewCell: UITableViewCell {
         
         
         self.fetchEditor()
-        
-        
-        
+   
         //        let dateFormatter:NSDateFormatter = NSDateFormatter()
         //        dateFormatter.dateFormat = "yyyy-MM-dd"
         //
