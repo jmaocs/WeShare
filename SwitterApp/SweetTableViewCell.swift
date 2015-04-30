@@ -109,16 +109,16 @@ class SweetTableViewCell: UITableViewCell {
         
         self.fetchEditor()
    
-        //        let dateFormatter:NSDateFormatter = NSDateFormatter()
-        //        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let formatter:NSDateFormatter = NSDateFormatter()
+        formatter.dateFormat = "MM-dd HH:mm"
         //
-        
-        let formatter = NSDateFormatter()
-        if NSDate().timeIntervalSinceDate(self.sweet!.createdAt) > 24*60*60 {
-            formatter.dateStyle = NSDateFormatterStyle.ShortStyle
-        } else {
-            formatter.timeStyle = NSDateFormatterStyle.ShortStyle
-        }
+//        
+//        let formatter = NSDateFormatter()
+//        if NSDate().timeIntervalSinceDate(self.sweet!.createdAt) > 24*60*60 {
+//            formatter.dateStyle = NSDateFormatterStyle.ShortStyle
+//        } else {
+//            formatter.timeStyle = NSDateFormatterStyle.ShortStyle
+//        }
         
         
         self.timestampLabel.text = formatter.stringFromDate(self.sweet!.createdAt)

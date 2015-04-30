@@ -10,11 +10,10 @@ import UIKit
 import Foundation
 import ParseUI
 
-class TimeLineTableViewController: UITableViewController, PFLogInViewControllerDelegate, PFSignUpViewControllerDelegate {
+class TimeLineTableViewController: UITableViewController, UINavigationControllerDelegate, PFLogInViewControllerDelegate, PFSignUpViewControllerDelegate, UIImagePickerControllerDelegate {
 
     
     var timelineData = [PFObject]()
-
     @IBAction func logout(sender: AnyObject) {
         PFUser.logOut()
         self.loginSetup()
@@ -25,6 +24,11 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        self.imageAction()
+        // Config for signup
+        signUpViewController.fields = (PFSignUpFields.UsernameAndPassword
+            | PFSignUpFields.SignUpButton
+            | PFSignUpFields.DismissButton)
         
 //        if NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1 {
 //            tableView.estimatedRowHeight = tableView.rowHeight
@@ -38,6 +42,7 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     override func viewDidAppear(animated: Bool) {
         self.loginSetup()
         self.refresh()
+        self.navigationItem.title = PFUser.currentUser()?.username
     }
     
     
@@ -59,9 +64,7 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
             }
         }
     }
-    
 
-    
     
     func refresh() {
         if refreshControl != nil {
@@ -86,6 +89,8 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+    
+   
 
     // MARK: - Table view data source
 
@@ -153,6 +158,40 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
     
     
     /********************************************************************************************/
+    // Image picker
+    func imagePickerController(picker: UIImagePickerController!, didFinishPickingMediaWithInfo info: NSDictionary!) {
+        let pickedImage:UIImage = info.objectForKey(UIImagePickerControllerOriginalImage) as UIImage
+        
+        // Scale down image
+        let scaledImage = self.scaleImageWith(pickedImage, newSize: CGSizeMake(100, 100))
+        
+        let imageData = UIImagePNGRepresentation(pickedImage)
+        let imageFile:PFFile = PFFile(data: imageData)
+        
+        PFUser.currentUser().setObject(imageFile, forKey: "profileImage")
+        PFUser.currentUser().saveInBackground()
+        
+        picker.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    func scaleImageWith(image:UIImage, newSize:CGSize)->UIImage {
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+        image.drawInRect(CGRectMake(0, 0, newSize.width, newSize.height))
+        var newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage
+    }
+    
+    func imageAction() {
+        var imagePicker:UIImagePickerController = UIImagePickerController()
+        imagePicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+        imagePicker.delegate = self
+        println("image")
+        self.presentViewController(imagePicker, animated: true, completion: nil)
+    }
+    
+    
+    /********************************************************************************************/
     
     func loginSetup() {
         if (PFUser.currentUser() == nil) {
@@ -176,6 +215,8 @@ class TimeLineTableViewController: UITableViewController, PFLogInViewControllerD
             self.presentViewController(logInViewController, animated: true, completion: nil)
         }
     }
+    
+
     
     // MARK: Parse Login
     

@@ -81,16 +81,15 @@ class DetailCommentTableViewCell: UITableViewCell {
             self.fetchEditor()
 
             // get comment time
-//            let dateFormatter:NSDateFormatter = NSDateFormatter()
-//            dateFormatter.dateFormat = "yyyy-MM-dd"
-//            
+            let formatter:NSDateFormatter = NSDateFormatter()
+            formatter.dateFormat = "MM-dd HH:mm"
             
-            let formatter = NSDateFormatter()
-            if NSDate().timeIntervalSinceDate(comment.createdAt) > 24*60*60 {
-                formatter.dateStyle = NSDateFormatterStyle.ShortStyle
-            } else {
-                formatter.timeStyle = NSDateFormatterStyle.ShortStyle
-            }
+//            let formatter = NSDateFormatter()
+//            if NSDate().timeIntervalSinceDate(comment.createdAt) > 24*60*60 {
+//                formatter.dateStyle = NSDateFormatterStyle.ShortStyle
+//            } else {
+//                formatter.timeStyle = NSDateFormatterStyle.ShortStyle
+//            }
             self.timestampLabel.text = formatter.stringFromDate(comment.createdAt)
             
             

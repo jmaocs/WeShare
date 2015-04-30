@@ -15,6 +15,8 @@ class ComposeViewController: UIViewController, UITextViewDelegate {
     @IBOutlet weak var charRemainingLabel: UILabel! = UILabel()
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
         sweetTextView.layer.borderColor = UIColor.blackColor().CGColor
         sweetTextView.layer.borderWidth = 0.5
         sweetTextView.layer.cornerRadius = 5

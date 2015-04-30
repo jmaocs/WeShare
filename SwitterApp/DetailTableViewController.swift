@@ -54,7 +54,10 @@ class DetailTableViewController: UITableViewController, UIPopoverPresentationCon
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
+    override func viewWillAppear(animated: Bool) {
+        self.navigationController?.navigationBar.backItem?.title = "Back"
+        self.navigationItem.title = PFUser.currentUser()?.username
+    }
     override func viewDidAppear(animated: Bool) {
         self.loadData()
     }
