@@ -48,15 +48,27 @@ class DetailCommentTableViewCell: UITableViewCell {
             self.usernameLabel.text = res.username
             
             // get profile images
-            if let gender = res.objectForKey("gender") as? NSObject {
-                if (gender == true) {
-                    self.avatarImg?.image = UIImage(named: "boy.jpg")
-                } else {
-                    self.avatarImg?.image = UIImage(named: "girl.png")
+            if let profileImage:PFFile = res.objectForKey("profileImage") as? PFFile {
+                profileImage.getDataInBackgroundWithBlock {
+                    (imageData:NSData!, error:NSError!)->Void in
+                    if !(error != nil) {
+                        let image:UIImage = UIImage(data: imageData)!
+                        self.avatarImg.image = image
+                    }
                 }
             } else {
-                self.avatarImg?.image = UIImage(named: "anonymous.png")
+                // get profile images
+                if let gender = res.objectForKey("gender") as? NSObject {
+                    if (gender == true) {
+                        self.avatarImg?.image = UIImage(named: "boy.jpg")
+                    } else {
+                        self.avatarImg?.image = UIImage(named: "girl.png")
+                    }
+                } else {
+                    self.avatarImg?.image = UIImage(named: "anonymous.png")
+                }
             }
+
             
             updateCommentTextLabel(res)
         }
